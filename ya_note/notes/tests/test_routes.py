@@ -34,7 +34,9 @@ class TestRoutes(TestCase):
         for name, method in urls:
             with self.subTest(name=name):
                 url = reverse(name)
+
                 response = method(url)
+
                 self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_redirect_for_anonymous_user(self):
@@ -52,7 +54,9 @@ class TestRoutes(TestCase):
             with self.subTest(name=name):
                 url = reverse(name, args=args)
                 redirect_url = f'{login_url}?next={url}'
+
                 response = self.client.get(url)
+
                 self.assertRedirects(response, redirect_url)
 
     def test_authorized_user_access(self):
@@ -69,7 +73,9 @@ class TestRoutes(TestCase):
         for name, args in urls:
             with self.subTest(name=name):
                 url = reverse(name, args=args)
+
                 response = self.client.get(url)
+
                 self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_edit_delete_access_restriction(self):
@@ -88,5 +94,7 @@ class TestRoutes(TestCase):
             for name in urls:
                 with self.subTest(user=user, name=name):
                     url = reverse(name, args=(self.note.slug,))
+
                     response = self.client.get(url)
+
                     self.assertEqual(response.status_code, status)

@@ -39,7 +39,9 @@ class TestNoteLogic(TestCase):
             'text': 'Текст заметки',
             'slug': 'new-note'
         }
+
         response = self.client.post(url, data=form_data)
+
         self.assertRedirects(response, reverse('notes:success'))
         self.assertTrue(Note.objects.filter(slug='new-note').exists())
 
@@ -51,8 +53,10 @@ class TestNoteLogic(TestCase):
             'text': 'Текст',
             'slug': 'anon-note'
         }
-        response = self.client.post(url, data=form_data)
         login_url = reverse('users:login')
+
+        response = self.client.post(url, data=form_data)
+
         self.assertRedirects(response, f'{login_url}?next={url}')
         self.assertFalse(Note.objects.filter(slug='anon-note').exists())
 
@@ -62,27 +66,32 @@ class TestNoteLogic(TestCase):
 
     def test_unique_slug_validation(self):
         """Запрещено создавать заметки с одинаковым slug."""
+        note = Note(
+            title='Новая заметка',
+            text='Текст',
+            author=self.user_1,
+            slug='test-note'
+        )
+
         with self.assertRaises(ValidationError):
-            note = Note(
-                title='Новая заметка',
-                text='Текст',
-                author=self.user_1,
-                slug='test-note'
-            )
             note.full_clean()
 
     def test_author_can_edit_note(self):
         """Автор может редактировать свою заметку."""
         self.client.force_login(self.user_1)
         url = reverse('notes:edit', args=(self.note.slug,))
+
         response = self.client.get(url)
+
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_author_can_delete_note(self):
         """Автор может удалить свою заметку."""
         self.client.force_login(self.user_1)
         url = reverse('notes:delete', args=(self.note.slug,))
+
         response = self.client.post(url)
+
         self.assertRedirects(response, reverse('notes:success'))
         self.assertFalse(Note.objects.filter(pk=self.note.pk).exists())
 
@@ -90,19 +99,24 @@ class TestNoteLogic(TestCase):
         """Чужую заметку нельзя редактировать (возвращает 404)."""
         self.client.force_login(self.user_2)
         url = reverse('notes:edit', args=(self.note.slug,))
-        response = self.client.post(url, data={
+        new_data = {
             'title': 'Попытка',
             'text': 'Новый текст',
             'slug': 'test-note'
-        })
-        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
+        }
+
+        response = self.client.post(url, data=new_data)
         self.note.refresh_from_db()
+
+        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
         self.assertNotEqual(self.note.text, 'Новый текст')
 
     def test_other_user_cannot_delete_someone_elses_note(self):
         """Чужую заметку нельзя удалить (возвращает 404)."""
         self.client.force_login(self.user_2)
         url = reverse('notes:delete', args=(self.note.slug,))
+
         response = self.client.post(url)
+
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
         self.assertTrue(Note.objects.filter(pk=self.note.pk).exists())
