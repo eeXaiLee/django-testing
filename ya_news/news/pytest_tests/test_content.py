@@ -1,12 +1,8 @@
-from datetime import timedelta
-
 import pytest
 from django.conf import settings
 from django.urls import reverse
-from django.utils import timezone
 
 from news.forms import CommentForm
-from news.models import Comment
 
 
 pytestmark = pytest.mark.django_db
@@ -29,18 +25,8 @@ def test_news_order(client):
     assert all_dates == sorted(all_dates, reverse=True)
 
 
-def test_comments_order(client, news, author, news_id_for_args):
+def test_comments_order(client, news, author, news_id_for_args, comments_list):
     """Комментарии на странице новости отсортированы от старых к новым."""
-    now = timezone.now()
-    for index in range(10):
-        comment = Comment.objects.create(
-            news=news,
-            author=author,
-            text=f'Комментарий {index}',
-        )
-        comment.created = now + timedelta(days=index)
-        comment.save()
-
     url = reverse('news:detail', args=news_id_for_args)
     response = client.get(url)
     news = response.context['news']

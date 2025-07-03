@@ -78,6 +78,20 @@ def news_list():
 
 
 @pytest.fixture
+def comments_list(news, author):
+    """Создаёт 10 тестовых комментариев с разными датами."""
+    now = timezone.now()
+    return [
+        Comment.objects.create(
+            news=news,
+            author=author,
+            text=f'Комментарий {index}',
+            created=now + timedelta(days=index)
+        ) for index in range(10)
+    ]
+
+
+@pytest.fixture
 def form_data():
     """Возвращает валидные данные для формы комментария."""
     return {'text': 'Новый комментарий'}
