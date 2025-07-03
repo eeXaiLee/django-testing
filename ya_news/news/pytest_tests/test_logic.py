@@ -8,7 +8,9 @@ from news.forms import BAD_WORDS, WARNING
 from news.models import Comment
 
 
-@pytest.mark.django_db
+pytestmark = pytest.mark.django_db
+
+
 def test_anonymous_user_cant_create_comment(
         client, news_id_for_args, form_data
 ):
@@ -18,7 +20,6 @@ def test_anonymous_user_cant_create_comment(
     assert Comment.objects.count() == 0
 
 
-@pytest.mark.django_db
 def test_user_can_create_comment(
     author_client, author, news, news_id_for_args, form_data
 ):
@@ -33,7 +34,6 @@ def test_user_can_create_comment(
     assert comment.author == author
 
 
-@pytest.mark.django_db
 def test_user_cant_use_bad_words(
     author_client, news_id_for_args
 ):
@@ -45,7 +45,6 @@ def test_user_cant_use_bad_words(
     assert Comment.objects.count() == 0
 
 
-@pytest.mark.django_db
 def test_author_can_edit_comment(
     author_client, comment, comment_for_args, news_id_for_args, form_data
 ):
@@ -58,7 +57,6 @@ def test_author_can_edit_comment(
     assert comment.text == form_data['text']
 
 
-@pytest.mark.django_db
 def test_author_can_delete_comment(
     author_client, comment_for_args, news_id_for_args
 ):
@@ -70,7 +68,6 @@ def test_author_can_delete_comment(
     assert Comment.objects.count() == 0
 
 
-@pytest.mark.django_db
 def test_user_cant_edit_comment_of_another_user(
     reader_client, comment, comment_for_args, form_data,
 ):
@@ -82,7 +79,6 @@ def test_user_cant_edit_comment_of_another_user(
     assert comment.text == comment_from_db.text
 
 
-@pytest.mark.django_db
 def test_user_cant_delete_comment_of_another_user(
     reader_client, comment_for_args
 ):

@@ -6,7 +6,9 @@ from pytest_django.asserts import assertRedirects
 from pytest_lazyfixture import lazy_fixture
 
 
-@pytest.mark.django_db
+pytestmark = pytest.mark.django_db
+
+
 @pytest.mark.parametrize(
     'name, args, method_name',
     (
@@ -46,7 +48,6 @@ def test_availability_for_comment_edit_and_delete(
     assert response.status_code == expected_status
 
 
-@pytest.mark.django_db
 @pytest.mark.parametrize(
     'name',
     ('news:edit', 'news:delete'),
