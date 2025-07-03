@@ -22,8 +22,7 @@ def test_pages_availability(
 ):
     """Публичные страницы доступны любому пользователю."""
     url = reverse(name, args=args)
-    method = getattr(client, method_name)
-    response = method(url)
+    response = getattr(client, method_name)(url)
     assert response.status_code == HTTPStatus.OK
 
 

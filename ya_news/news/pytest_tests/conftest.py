@@ -38,19 +38,17 @@ def reader_client(reader):
 @pytest.fixture
 def news():
     """Создает тестовую новость."""
-    news = News.objects.create(title='Заголовок', text='Текст')
-    return news
+    return News.objects.create(title='Заголовок', text='Текст')
 
 
 @pytest.fixture
 def comment(news, author):
     """Создаёт тестовый комментарий к новости от автора."""
-    comment = Comment.objects.create(
+    return Comment.objects.create(
         news=news,
         author=author,
         text='Текст комментария'
     )
-    return comment
 
 
 @pytest.fixture
@@ -69,19 +67,16 @@ def comment_for_args(comment):
 def news_list():
     """Создает список новостей для тестирования пагинации."""
     today = datetime.today()
-    news_list = [
+    return News.objects.bulk_create([
         News(
             title=f'Новость {index}',
             text='Просто текст.',
             date=today - timedelta(days=index),
         ) for index in range(settings.NEWS_COUNT_ON_HOME_PAGE + 1)
-    ]
-    return News.objects.bulk_create(news_list)
+    ])
 
 
 @pytest.fixture
 def form_data():
     """Возвращает валидные данные для формы комментария."""
-    return {
-        'text': 'Новый комментарий'
-    }
+    return {'text': 'Новый комментарий'}

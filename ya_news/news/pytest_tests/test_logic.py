@@ -15,8 +15,7 @@ def test_anonymous_user_cant_create_comment(
     """Анонимный пользователь не может отправить комментарий."""
     url = reverse('news:detail', args=news_id_for_args)
     client.post(url, data=form_data)
-    comments_count = Comment.objects.count()
-    assert comments_count == 0
+    assert Comment.objects.count() == 0
 
 
 @pytest.mark.django_db
