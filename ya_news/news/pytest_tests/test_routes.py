@@ -3,23 +3,26 @@ from http import HTTPStatus
 import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertRedirects
-from pytest_lazy_fixtures import lf
+from pytest_lazyfixture import lazy_fixture
 
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    'name, args, method',
+    'name, args, method_name',
     (
-        ('news:home', None, lf('client.get')),
-        ('news:detail', lf('news_id_for_args'), lf('client.get')),
-        ('users:login', None, lf('client.get')),
-        ('users:logout', None, lf('client.post')),
-        ('users:signup', None, lf('client.get')),
+        ('news:home', None, 'get'),
+        ('news:detail', lazy_fixture('news_id_for_args'), 'get'),
+        ('users:login', None, 'get'),
+        ('users:logout', None, 'post'),
+        ('users:signup', None, 'get'),
     ),
 )
-def test_public_pages_available_for_anonymous_user(name, args, method):
+def test_public_pages_available_for_anonymous_user(
+    client, name, args, method_name
+):
     """Публичные страницы доступны анонимному пользователю."""
     url = reverse(name, args=args)
+    method = getattr(client, method_name)
     response = method(url)
     assert response.status_code == HTTPStatus.OK
 
@@ -27,8 +30,8 @@ def test_public_pages_available_for_anonymous_user(name, args, method):
 @pytest.mark.parametrize(
     'parametrized_client, expected_status',
     (
-        (lf('author_client'), HTTPStatus.OK),
-        (lf('reader_client'), HTTPStatus.NOT_FOUND),
+        (lazy_fixture('author_client'), HTTPStatus.OK),
+        (lazy_fixture('reader_client'), HTTPStatus.NOT_FOUND),
     )
 )
 @pytest.mark.parametrize(
