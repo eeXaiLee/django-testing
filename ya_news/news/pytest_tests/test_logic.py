@@ -38,7 +38,7 @@ def test_user_can_create_comment(
 def test_user_cant_use_bad_words(
     author_client, news_id_for_args
 ):
-    """Нельзя использовать запрещённые слова в комментарии."""
+    """Запрет использования запрещённых слов в комментарии."""
     bad_words_data = {'text': f'Какой-то текст, {BAD_WORDS[0]}, еще текст'}
     url = reverse('news:detail', args=news_id_for_args)
     response = author_client.post(url, data=bad_words_data)
@@ -75,7 +75,7 @@ def test_author_can_delete_comment(
 def test_user_cant_edit_comment_of_another_user(
     reader_client, comment, comment_for_args, form_data,
 ):
-    """Нельзя редактировать чужой комментарий."""
+    """Нельзя редактировать чужой комментарий (возвращает 404)."""
     url = reverse('news:edit', args=comment_for_args)
     response = reader_client.post(url, data=form_data)
     assert response.status_code == HTTPStatus.NOT_FOUND
@@ -87,7 +87,7 @@ def test_user_cant_edit_comment_of_another_user(
 def test_user_cant_delete_comment_of_another_user(
     reader_client, comment_for_args
 ):
-    """Нельзя удалить чужой комментарий."""
+    """Нельзя удалить чужой комментарий (возвращает 404)."""
     url = reverse('news:delete', args=comment_for_args)
     response = reader_client.delete(url)
     assert response.status_code == HTTPStatus.NOT_FOUND

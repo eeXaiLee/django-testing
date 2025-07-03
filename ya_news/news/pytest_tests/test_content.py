@@ -11,7 +11,7 @@ from news.models import Comment
 
 @pytest.mark.django_db
 def test_news_count(client, news_list):
-    """На главной странице отображается правильное количество новостей."""
+    """Количество новостей на главной не превышает заданный лимит."""
     url = reverse('news:home')
     response = client.get(url)
     object_list = response.context['object_list']

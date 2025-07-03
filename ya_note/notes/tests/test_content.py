@@ -9,9 +9,11 @@ User = get_user_model()
 
 
 class TestContent(TestCase):
+    """Тестирование корректности отображения контента заметок."""
 
     @classmethod
     def setUpTestData(cls):
+        """Создаёт тестовых пользователей и заметки для проверок."""
         cls.user_1 = User.objects.create(username='Пользователь_1')
         cls.user_2 = User.objects.create(username='Пользователь_2')
         cls.note = Note.objects.create(
@@ -27,7 +29,7 @@ class TestContent(TestCase):
         )
 
     def test_user_sees_only_own_notes_in_list(self):
-        """Проверка, что в списке только свои заметки."""
+        """В списке отображаются только заметки текущего пользователя."""
         self.client.force_login(self.user_1)
         response = self.client.get(reverse('notes:list'))
         object_list = response.context['object_list']
@@ -44,7 +46,7 @@ class TestContent(TestCase):
         self.assertContains(response, self.note.text)
 
     def test_form_fields_on_create_page(self):
-        """Проверка отображения полей формы."""
+        """Форма содержит поля title, text и slug."""
         self.client.force_login(self.user_1)
         url = reverse('notes:add')
         response = self.client.get(url)

@@ -17,10 +17,10 @@ from pytest_lazyfixture import lazy_fixture
         ('users:signup', None, 'get'),
     ),
 )
-def test_public_pages_available_for_anonymous_user(
+def test_pages_availability(
     client, name, args, method_name
 ):
-    """Публичные страницы доступны анонимному пользователю."""
+    """Публичные страницы доступны любому пользователю."""
     url = reverse(name, args=args)
     method = getattr(client, method_name)
     response = method(url)
@@ -53,7 +53,7 @@ def test_availability_for_comment_edit_and_delete(
     ('news:edit', 'news:delete'),
 )
 def test_redirect_for_anonymous_client(client, name, comment_for_args):
-    """Анонимный пользователь перенаправляется на страницу входа."""
+    """Аноним перенаправляется на страницу входа при попытке редактирования."""
     login_url = reverse('users:login')
     url = reverse(name, args=comment_for_args)
     expected_url = f'{login_url}?next={url}'

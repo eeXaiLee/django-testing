@@ -44,7 +44,7 @@ def news():
 
 @pytest.fixture
 def comment(news, author):
-    """Создает тестовый комментарий."""
+    """Создаёт тестовый комментарий к новости от автора."""
     comment = Comment.objects.create(
         news=news,
         author=author,
@@ -81,7 +81,7 @@ def news_list():
 
 @pytest.fixture
 def form_data():
-    """Возвращает данные для формы комментария."""
+    """Возвращает валидные данные для формы комментария."""
     return {
         'text': 'Новый комментарий'
     }

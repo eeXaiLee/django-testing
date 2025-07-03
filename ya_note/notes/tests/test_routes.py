@@ -10,9 +10,11 @@ User = get_user_model()
 
 
 class TestRoutes(TestCase):
+    """Тестирование доступности маршрутов для разных пользователей."""
 
     @classmethod
     def setUpTestData(cls):
+        """Создаёт тестовых пользователей и заметки для проверки маршрутов."""
         cls.user_1 = User.objects.create(username='Пользователь_1')
         cls.user_2 = User.objects.create(username='Пользователь_2')
         cls.note = Note.objects.create(
@@ -36,7 +38,7 @@ class TestRoutes(TestCase):
                 self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_redirect_for_anonymous_user(self):
-        """Анонимный пользователь перенаправляется на страницу входа."""
+        """Аноним перенаправляется на вход при доступе к заметкам."""
         login_url = reverse('users:login')
         urls = (
             ('notes:list', None),
@@ -54,7 +56,7 @@ class TestRoutes(TestCase):
                 self.assertRedirects(response, redirect_url)
 
     def test_authorized_user_access(self):
-        """Авторизованный пользователь имеет доступ к защищённым страницам."""
+        """Авторизованный пользователь имеет доступ к заметкам."""
         self.client.force_login(self.user_1)
         urls = (
             ('notes:list', None),

@@ -11,10 +11,11 @@ User = get_user_model()
 
 
 class TestNoteLogic(TestCase):
+    """Тестирование бизнес-логики работы с заметками."""
 
     @classmethod
     def setUpTestData(cls):
-        """Создание тестовых пользователей и заметки."""
+        """Создаёт тестовых пользователей и заметки для проверки логики."""
         cls.user_1 = User.objects.create(username='Пользователь 1')
         cls.user_2 = User.objects.create(username='Пользователь 2')
         cls.note = Note.objects.create(
@@ -56,11 +57,11 @@ class TestNoteLogic(TestCase):
         self.assertFalse(Note.objects.filter(slug='anon-note').exists())
 
     def test_slug_auto_creation(self):
-        """Проверка автоматического создания slug."""
+        """Slug создаётся из заголовка при его отсутствии."""
         self.assertEqual(self.note_auto_slug.slug, 'avtomaticheskij-slug')
 
     def test_unique_slug_validation(self):
-        """Проверка валидации уникальности slug."""
+        """Запрещено создавать заметки с одинаковым slug."""
         with self.assertRaises(ValidationError):
             note = Note(
                 title='Новая заметка',
@@ -71,7 +72,7 @@ class TestNoteLogic(TestCase):
             note.full_clean()
 
     def test_author_can_edit_note(self):
-        """Автор может получить страницу редактирования заметки."""
+        """Автор может редактировать свою заметку."""
         self.client.force_login(self.user_1)
         url = reverse('notes:edit', args=(self.note.slug,))
         response = self.client.get(url)
@@ -86,7 +87,7 @@ class TestNoteLogic(TestCase):
         self.assertFalse(Note.objects.filter(pk=self.note.pk).exists())
 
     def test_other_user_cannot_edit_someone_elses_note(self):
-        """Авторизованный пользователь не может редактировать чужую заметку."""
+        """Чужую заметку нельзя редактировать (возвращает 404)."""
         self.client.force_login(self.user_2)
         url = reverse('notes:edit', args=(self.note.slug,))
         response = self.client.post(url, data={
@@ -99,7 +100,7 @@ class TestNoteLogic(TestCase):
         self.assertNotEqual(self.note.text, 'Новый текст')
 
     def test_other_user_cannot_delete_someone_elses_note(self):
-        """Авторизованный пользователь не может удалить чужую заметку."""
+        """Чужую заметку нельзя удалить (возвращает 404)."""
         self.client.force_login(self.user_2)
         url = reverse('notes:delete', args=(self.note.slug,))
         response = self.client.post(url)
